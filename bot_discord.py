@@ -14,7 +14,12 @@ API_TOKEN     = "8202824165:ZL7jSQTQ"
 API_URL       = "https://leakosintapi.com/"
 LANG          = "fr"
 LIMIT         = 300
-ALLOWED_ROLE_ID  = 1469989510514217023
+ALLOWED_ROLE_IDS = [
+    1469989510514217023,   # whitelist principal
+    1490481959695290408,   # rôle ajouté
+    1490427820910972968,   # autre serveur
+    1490427833498206258,   # autre serveur
+]
 LOG_CHANNEL_ID   = 1490343808385155072
 
 RED              = 0x4B2861
@@ -296,8 +301,8 @@ class SearchSelect(discord.ui.Select):
         )
 
     async def callback(self, i: discord.Interaction):
-        role = discord.utils.get(i.user.roles, id=ALLOWED_ROLE_ID)
-        if role is None:
+        role = any(r.id in ALLOWED_ROLE_IDS for r in i.user.roles)
+        if not role:
             await i.response.send_message(
                 embed=discord.Embed(
                     title="**OpSec S€archer**",
@@ -399,8 +404,8 @@ async def on_command_error(ctx, error):
 
 @bot.command()
 async def menu(ctx):
-    role = discord.utils.get(ctx.author.roles, id=ALLOWED_ROLE_ID)
-    if role is None:
+    role = any(r.id in ALLOWED_ROLE_IDS for r in ctx.author.roles)
+    if not role:
         e = discord.Embed(
             title="**OpSec S€archer**",
             description=(
